@@ -54,7 +54,7 @@ constexpr char INPUT_COMPONENT_KEY_POINTCLOUD[] = "pointcloud_to_flatscan/rx_poi
 constexpr char INPUT_DEFAULT_TENSOR_FORMAT_POINTCLOUD[] = "nitros_point_cloud";
 constexpr char INPUT_TOPIC_NAME_POINTCLOUD[] = "pointcloud";
 
-constexpr char OUTPUT_COMPONENT_KEY_FLATSCAN[] = "vault/vault";
+constexpr char OUTPUT_COMPONENT_KEY_FLATSCAN[] = "sink/sink";
 constexpr char OUTPUT_DEFAULT_TENSOR_FORMAT_FLATSCAN[] = "nitros_flat_scan";
 constexpr char OUTPUT_TOPIC_NAME_FLATSCAN[] = "flatscan";
 

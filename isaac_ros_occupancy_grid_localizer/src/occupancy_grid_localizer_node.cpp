@@ -74,7 +74,7 @@ constexpr char INPUT_COMPONENT_KEY_FLATSCAN[] = "flatscan_beams_tensor_copier/rx
 constexpr char INPUT_DEFAULT_TENSOR_FORMAT_FLATSCAN[] = "nitros_flat_scan";
 constexpr char INPUT_TOPIC_NAME_FLATSCAN[] = "flatscan_localization";
 
-constexpr char OUTPUT_COMPONENT_KEY_LOC_RESULT[] = "vault/vault";
+constexpr char OUTPUT_COMPONENT_KEY_LOC_RESULT[] = "sink/sink";
 constexpr char OUTPUT_DEFAULT_TENSOR_FORMAT_LOC_RESULT[] = "nitros_pose_cov_stamped";
 constexpr char OUTPUT_TOPIC_NAME_LOC_RESULT[] = "localization_result";
 constexpr char OUTPUT_FRAME_ID_MAP_KEY[] = "map";
