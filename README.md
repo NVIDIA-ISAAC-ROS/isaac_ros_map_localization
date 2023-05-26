@@ -35,9 +35,10 @@ This package is powered by [NVIDIA Isaac Transport for ROS (NITROS)](https://dev
 
 The following table summarizes the per-platform performance statistics of sample graphs that use this package, with links included to the full benchmark output. These benchmark configurations are taken from the [Isaac ROS Benchmark](https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark#list-of-isaac-ros-benchmarks) collection, based on the [`ros2_benchmark`](https://github.com/NVIDIA-ISAAC-ROS/ros2_benchmark) framework.
 
-| Sample Graph                                                                                                                                         | Input Size | AGX Orin                                                                                                                                           | Orin NX                                                                                                                                            | Orin Nano 8GB                                                                                                                                            | x86_64 w/ RTX 3060 Ti                                                                                                                                       |
-| ---------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [Occupancy Grid Localizer Node](https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/main/scripts//isaac_ros_grid_localizer_node.py) | ~50 sq. m         | [16.0 fps](https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/main/results/isaac_ros_grid_localizer_node-agx_orin.json)<br>79 ms | [7.33 fps](https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/main/results/isaac_ros_grid_localizer_node-orin_nx.json)<br>150 ms | [5.16 fps](https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/main/results/isaac_ros_grid_localizer_node-orin_nano_8gb.json)<br>220 ms | [46.5 fps](https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/main/results/isaac_ros_grid_localizer_node-x86_64_rtx_3060Ti.json)<br>33 ms |
+| Sample Graph                                                                                                                                         | Input Size | AGX Orin                                                                                                                                           | Orin NX                                                                                                                                            | Orin Nano 8GB                                                                                                                                        | x86_64 w/ RTX 4060 Ti                                                                                                                                |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Occupancy Grid Localizer Node](https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/main/scripts//isaac_ros_grid_localizer_node.py) | ~50 sq. m  | [15.9 fps](https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/main/results/isaac_ros_grid_localizer_node-agx_orin.json)<br>65 ms | [7.33 fps](https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/main/results/isaac_ros_grid_localizer_node-orin_nx.json)<br>140 ms | [5.17 fps](https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/main/results/isaac_ros_grid_localizer_node-orin_nano.json)<br>200 ms | [50.1 fps](https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_benchmark/blob/main/results/isaac_ros_grid_localizer_node-nuc_4060ti.json)<br>20 ms |
+
 
 
 ## Table of Contents
@@ -81,7 +82,7 @@ The following table summarizes the per-platform performance statistics of sample
 
 ## Latest Update
 
-2023-04-05: Added `isaac_ros_occupancy_grid_localizer`
+2023-05-25: Performance improvements.
 
 ## Supported Platforms
 
@@ -362,4 +363,5 @@ For solutions to problems with Isaac ROS, please check [here](https://github.com
 
 | Date       | Changes                                    |
 | ---------- | ------------------------------------------ |
+| 2023-05-25 | Performance improvements                   |
 | 2023-04-05 | Added `isaac_ros_occupancy_grid_localizer` |

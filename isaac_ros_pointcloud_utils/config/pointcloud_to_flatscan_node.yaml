@@ -56,9 +56,9 @@ components:
     max_points: 691200
 ---
 ###########################
-# Vault for ROS Publisher #
+# Sink for ROS Publisher #
 ###########################
-name: vault
+name: sink
 components:
 - name: signal
   type: nvidia::gxf::DoubleBufferReceiver
@@ -69,28 +69,26 @@ components:
   parameters:
     receiver: signal
     min_size: 1
-- name: vault
-  type: nvidia::gxf::Vault
+- name: sink
+  type: nvidia::isaac_ros::MessageRelay
   parameters:
     source: signal
-    max_waiting_count: 1
-    drop_waiting: false
 ---
 components:
 - name: edge0
   type: nvidia::gxf::Connection
   parameters:
     source: pointcloud_to_flatscan/tx_flatscan
-    target: vault/signal
+    target: sink/signal
 ---
 components:
 - name: clock
   type: nvidia::gxf::RealtimeClock
-- type: nvidia::gxf::MultiThreadScheduler
+- type: nvidia::gxf::GreedyScheduler
   parameters:
     clock: clock
-    worker_thread_number: 8
     stop_on_deadlock: false
+    check_recession_period_us: 100
 - type: nvidia::gxf::JobStatistics
   parameters:
     clock: clock
