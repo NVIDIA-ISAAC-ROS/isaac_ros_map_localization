@@ -52,8 +52,11 @@ public:
 
   OccupancyGridLocalizerNode & operator=(const OccupancyGridLocalizerNode &) = delete;
 
-  // The callback to be implemented by users for any required initialization
+  // callback used for overiding gxf parameters
   void postLoadGraphCallback() override;
+
+  // callback used for overiding gxf parameters that is not supported by gxf functions
+  void preLoadGraphCallback() override;
 
   void GridSearchLocalizationCallback(
     const std::shared_ptr<std_srvs::srv::Empty::Request>,
@@ -97,6 +100,12 @@ private:
   const double robot_radius_;
   // The maximum beam error used when comparing range scans.
   const double max_beam_error_;
+  // The max output error from our best sample, if output error larger than this threshold, we
+  // conclude localization failed
+  const double max_output_error_;
+  // The minimal output error used to normalize and compute confidence, if output error from best
+  // sample smaller or equal to this, the confidence is 1
+  const double min_output_error_;
   // The GPU accelerated scan-and-match function can only handle a certain number of beams per
   // range scan. The allowed values are {32, 64, 128, 256, 512}. If the number of beams in the
   // range scan does not match this number a subset of beams will be taken.
@@ -104,6 +113,9 @@ private:
   // This is the number of scans to collect into a batch for the GPU kernel. Choose a value which
   // matches your GPU well.
   const int batch_size_;
+  // Distance between sample points in meters. The smaller this number, the more sample poses
+  // will be considered. This leads to a higher accuracy and lower performance.
+  const double sample_distance_;
   // Points range larger than this threshold will be marked as out of range and not used.
   const double out_of_range_threshold_;
   // Points range smaller than this threshold will be marked as invalid and not used.
@@ -113,12 +125,6 @@ private:
   // Whether or not pick the closest angle beam in angle bucket, if not pick the average within an
   // angular bucket
   const bool use_closest_beam_;
-  // The minimal output error used to normalize and compute confidence, if output error from best
-  // sample smaller or equal to this, the confidence is 1
-  const double min_output_error_;
-  // The max output error from our best sample, if output error larger than this threshold, we
-  // conclude localization failed
-  const double max_output_error_;
 
   unsigned int map_png_height_;
   std::shared_ptr<tf2_ros::TransformListener> tf_listener_;
