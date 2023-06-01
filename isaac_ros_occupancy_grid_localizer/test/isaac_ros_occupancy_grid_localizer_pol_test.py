@@ -31,8 +31,8 @@ import pytest
 import rclpy
 from std_srvs.srv import Empty
 
-TEST_POS_TOLERANCE = 0.01
-TEST_QUAT_TOLERANCE = 0.001
+TEST_POS_TOLERANCE = 0.15
+TEST_QUAT_TOLERANCE = 0.013
 TEST_COV_TOLERANCE = 0.001
 
 

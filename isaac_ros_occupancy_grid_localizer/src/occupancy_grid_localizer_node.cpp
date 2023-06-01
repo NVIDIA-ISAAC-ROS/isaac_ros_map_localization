@@ -139,14 +139,15 @@ OccupancyGridLocalizerNode::OccupancyGridLocalizerNode(const rclcpp::NodeOptions
   use_gxf_map_convention_(declare_parameter<bool>("use_gxf_map_convention", false)),
   robot_radius_(declare_parameter<double>("robot_radius", 0.25)),
   max_beam_error_(declare_parameter<double>("max_beam_error", 0.5)),
+  max_output_error_(declare_parameter<double>("max_output_error", 0.35)),
+  min_output_error_(declare_parameter<double>("min_output_error", 0.22)),
   num_beams_gpu_(declare_parameter<int>("num_beams_gpu", 512)),
   batch_size_(declare_parameter<int>("batch_size", 512)),
+  sample_distance_(declare_parameter<double>("sample_distance", 0.1)),
   out_of_range_threshold_(declare_parameter<double>("out_of_range_threshold", 100.0)),
   invalid_range_threshold_(declare_parameter<double>("invalid_range_threshold", 0.0)),
   min_scan_fov_degrees_(declare_parameter<double>("min_scan_fov_degrees", 270.0)),
-  use_closest_beam_(declare_parameter<bool>("use_closest_beam", true)),
-  min_output_error_(declare_parameter<double>("min_output_error", 0.22)),
-  max_output_error_(declare_parameter<double>("max_output_error", 0.35))
+  use_closest_beam_(declare_parameter<bool>("use_closest_beam", true))
 {
   RCLCPP_DEBUG(get_logger(), "[OccupancyGridLocalizerNode] Constructor");
 
@@ -377,6 +378,15 @@ void OccupancyGridLocalizerNode::LocResultNitrosSubCallback(
   // The ros_pose_isaac_transform transformation matrix is
   // applied so that the published output conforms to ROS map conventions
   *pose_handle = ros_map_origin_transform * ros_pose_isaac_transform * (*pose_handle);
+}
+
+void OccupancyGridLocalizerNode::preLoadGraphCallback()
+{
+  RCLCPP_INFO(get_logger(), "[OccupancyGridLocalizerNode] preLoadGraphCallback().");
+  // Setting gxf parameters not supported by gxf functions
+  NitrosNode::preLoadGraphSetParameter(
+    "binary_occupancy_map_loader", "nvidia::isaac::OccupancyGridMap", "sample_distance",
+    std::to_string(sample_distance_));
 }
 
 void OccupancyGridLocalizerNode::postLoadGraphCallback()
