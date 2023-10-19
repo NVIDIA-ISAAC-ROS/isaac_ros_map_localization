@@ -24,8 +24,7 @@ def generate_launch_description():
     pointcloud_to_flatscan_node = ComposableNode(
         package='isaac_ros_pointcloud_utils',
         plugin='nvidia::isaac_ros::pointcloud_utils::PointCloudToFlatScanNode',
-        name='pointcloud_to_flatscan',
-        parameters=[{'flatscan_frame': 'lidar'}])
+        name='pointcloud_to_flatscan')
 
     pointcloud_to_flatscan_container = ComposableNodeContainer(
         package='rclcpp_components',

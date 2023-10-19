@@ -108,18 +108,8 @@ def generate_launch_description():
         package='tf2_ros', executable='static_transform_publisher',
         parameters=[{'use_sim_time': LaunchConfiguration('use_sim_time')}],
         output='screen',
-        arguments=['0.0', '0.0', '-0.3', '0.0', '0.0', '0.0', 'base_link',
-                   'base_footprint'],
+        arguments=['0.0', '0.0', '0', '0.0', '0.0', '0.0', 'base_link', 'base_footprint'],
         condition=IfCondition(LaunchConfiguration('run_nav2')))
-
-    # Seting transform between lidar_frame and base_link
-    # since Isaac Sim does not set this transform
-    baselink_lidar_publisher = Node(
-        package='tf2_ros', executable='static_transform_publisher',
-        parameters=[{'use_sim_time': LaunchConfiguration('use_sim_time')}],
-        output='screen',
-        arguments=['0.0', '0.0', '0.0', '0.0', '0.0', '0.0', 'base_link',
-                   'lidar_frame'])
 
     return LaunchDescription([
         map_file_arg,
@@ -130,6 +120,5 @@ def generate_launch_description():
         rviz_launch,
         nav2_launch,
         baselink_basefootprint_publisher,
-        baselink_lidar_publisher,
         occupancy_grid_localizer_container
     ])

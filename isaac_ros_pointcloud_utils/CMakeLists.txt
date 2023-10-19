@@ -49,8 +49,16 @@ if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   ament_lint_auto_find_test_dependencies()
 
+
+  # The FindPythonInterp and FindPythonLibs modules are removed
+  if(POLICY CMP0148)
+    cmake_policy(SET CMP0148 OLD)
+  endif()
+
   find_package(launch_testing_ament_cmake REQUIRED)
   add_launch_test(test/isaac_ros_pointcloud_to_flatscan_pol_test.py)
+  add_launch_test(test/isaac_ros_laserscan_to_flatscan_pol_test.py)
+  add_launch_test(test/isaac_ros_flatscan_to_laserscan_pol_test.py)
 endif()
 
 ament_auto_package(INSTALL_TO_SHARE config launch)

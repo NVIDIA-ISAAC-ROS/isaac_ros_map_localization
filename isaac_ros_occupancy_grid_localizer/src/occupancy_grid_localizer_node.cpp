@@ -324,14 +324,14 @@ void OccupancyGridLocalizerNode::FlatScanNitrosSubCallback(
   // and FlatScan frame_id
   pose_tree_handle->set(
     robot_frame_uid, pose_frame_uid->uid, 0.0,
-    ::isaac::Pose3d{
-          ::isaac::SO3d::FromQuaternion(
-            ::isaac::Quaterniond{
+    ::nvidia::isaac::Pose3d{
+          ::nvidia::isaac::SO3d::FromQuaternion(
+            ::nvidia::isaac::Quaterniond{
             baselink_to_lidar_transform.transform.rotation.w,
             baselink_to_lidar_transform.transform.rotation.x,
             baselink_to_lidar_transform.transform.rotation.y,
             baselink_to_lidar_transform.transform.rotation.z}),
-          ::isaac::Vector3d(
+          ::nvidia::isaac::Vector3d(
             baselink_to_lidar_transform.transform.translation.x,
             baselink_to_lidar_transform.transform.translation.y,
             baselink_to_lidar_transform.transform.translation.z)}
@@ -346,7 +346,7 @@ void OccupancyGridLocalizerNode::LocResultNitrosSubCallback(
 {
   auto msg_entity = nvidia::gxf::Entity::Shared(context, msg.handle);
   // Get pose
-  auto maybe_pose = msg_entity->get<::isaac::Pose3d>(kPoseName);
+  auto maybe_pose = msg_entity->get<::nvidia::isaac::Pose3d>(kPoseName);
   if (!maybe_pose) {
     std::stringstream error_msg;
     error_msg <<
@@ -364,15 +364,15 @@ void OccupancyGridLocalizerNode::LocResultNitrosSubCallback(
   // with the X-axis in pointing down and the Y-axis pointing to the right.
   // Hence the transformation matrix from the Isaac map frame to the
   // ROS map frame is as shown below
-  auto ros_pose_isaac_transform = ::isaac::Pose3d{
-    ::isaac::SO3d::FromQuaternion(
-      ::isaac::Quaterniond{0.7071068, 0.0, 0.0, -0.7071068}),
-    ::isaac::Vector3d(0.0, map_png_height_ * cell_size_, 0.0)
+  auto ros_pose_isaac_transform = ::nvidia::isaac::Pose3d{
+    ::nvidia::isaac::SO3d::FromQuaternion(
+      ::nvidia::isaac::Quaterniond{0.7071068, 0.0, 0.0, -0.7071068}),
+    ::nvidia::isaac::Vector3d(0.0, map_png_height_ * cell_size_, 0.0)
   };
 
   auto ros_map_origin_transform =
-    ::isaac::Pose3d::FromPose2XY(
-    {::isaac::SO2d::FromAngle(
+    ::nvidia::isaac::Pose3d::FromPose2XY(
+    {::nvidia::isaac::SO2d::FromAngle(
         map_origin_[2]), {map_origin_[0], map_origin_[1]}});
 
   // The ros_pose_isaac_transform transformation matrix is

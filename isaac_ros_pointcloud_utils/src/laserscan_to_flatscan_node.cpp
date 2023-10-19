@@ -37,11 +37,11 @@ LaserScantoFlatScanNode::LaserScantoFlatScanNode(rclcpp::NodeOptions options)
 : Node("laserscan_to_flatscan", options.use_intra_process_comms(true)),
   // topics
   laserscan_sub_(create_subscription<sensor_msgs::msg::LaserScan>(
-      "/scan", 10, std::bind(&LaserScantoFlatScanNode::LaserScanCallback,
+      "scan", 10, std::bind(&LaserScantoFlatScanNode::LaserScanCallback,
       this, std::placeholders::_1))),
   flatscan_pub_(
     create_publisher<isaac_ros_pointcloud_interfaces::msg::FlatScan>(
-      "/flatscan", rclcpp::QoS(10)))
+      "flatscan", rclcpp::QoS(10)))
 {
 }
 
