@@ -39,11 +39,11 @@ FlatScantoLaserScanNode::FlatScantoLaserScanNode(rclcpp::NodeOptions options)
   max_range_fallback_(declare_parameter<double>("max_range_fallback", 200.0)),
   // topics
   flatscan_sub_(create_subscription<isaac_ros_pointcloud_interfaces::msg::FlatScan>(
-      "/flatscan", 10, std::bind(&FlatScantoLaserScanNode::FlatScanCallback, this,
+      "flatscan", 10, std::bind(&FlatScantoLaserScanNode::FlatScanCallback, this,
       std::placeholders::_1))),
   laserscan_pub_(
     create_publisher<sensor_msgs::msg::LaserScan>(
-      "/scan", rclcpp::QoS(10)))
+      "scan", rclcpp::QoS(10)))
 {}
 
 void FlatScantoLaserScanNode::FlatScanCallback(
@@ -66,11 +66,13 @@ void FlatScantoLaserScanNode::FlatScanCallback(
   uint32_t ranges_size = std::ceil(
     (laser_scan_message.angle_max - laser_scan_message.angle_min) /
     laser_scan_message.angle_increment);
+  // Intialize all values in the ranges array with laser_scan_message.range_max
   laser_scan_message.ranges.assign(ranges_size, laser_scan_message.range_max);
-
   for (size_t i = 0; i < msg->ranges.size(); i++) {
     float range = msg->ranges[i];
     float angle = msg->angles[i];
+    // angle origin is shifted by the start angle which is laser_scan_message.angle_min
+    angle = angle + laser_scan_message.angle_min;
     // Ensure that angles are within [0,2*M_PI)
     if (angle >= 2 * M_PI || angle <= -2 * M_PI) {
       angle = fmod(angle, (2 * M_PI));
@@ -78,7 +80,7 @@ void FlatScantoLaserScanNode::FlatScanCallback(
     if (angle < 0) {
       angle = angle + 2 * M_PI;
     }
-    int index = (angle - laser_scan_message.angle_min) / laser_scan_message.angle_increment;
+    int index = angle / laser_scan_message.angle_increment;
     if (range < laser_scan_message.ranges[index]) {
       laser_scan_message.ranges[index] = range;
     }

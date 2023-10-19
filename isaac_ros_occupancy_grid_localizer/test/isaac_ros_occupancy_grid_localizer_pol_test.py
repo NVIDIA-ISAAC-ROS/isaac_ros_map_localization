@@ -117,6 +117,8 @@ class IsaacROSOccupancyGridLocalizerPOLTest(IsaacROSBaseTest):
             self.assertTrue(
                 done, "Didn't receive output on localization_result topic!")
 
+            self.node._logger.info('At least one message was received.')
+
             loc_result_actual = received_messages['localization_result'][0]
             self.assertAlmostEqual(loc_result_actual.pose.pose.position.x,
                                    33.5, None,
@@ -151,6 +153,8 @@ class IsaacROSOccupancyGridLocalizerPOLTest(IsaacROSBaseTest):
                                        0.0, None,
                                        'received covariance is not within tolerance',
                                        TEST_COV_TOLERANCE)
+
+            self.node._logger.info('Received message was verified successfully.')
 
         finally:
             pass

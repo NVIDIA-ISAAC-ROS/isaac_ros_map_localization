@@ -49,9 +49,10 @@ components:
   parameters:
     cell_size: 0.05 # Will be overidden with ROS parameter 'resolution'
     threshold: 200 # Will be overidden with ROS parameter 'occupancy_grid_map_threshold'
-    binary_occupancy_map_tensor: binary_occupancy_map
+    occupancy_map_image: binary_occupancy_map
     map_frame: global_pose_tree/map_frame
     device_allocator: device_allocator
+    allocator: host_allocator
 - type: nvidia::gxf::CountSchedulingTerm
   parameters:
     count: 1
@@ -104,7 +105,7 @@ components:
     parameters:
       policy: 0
   - name: localization_to_pose3d
-    type: nvidia::isaac::localization::LocalizationToPose3d
+    type: nvidia::isaac::localization::LocalizationResultToPose3d
     parameters:
       rx_localization_result: rx_localization_result
       tx_pose3d_cov: tx_pose3d_cov
@@ -196,6 +197,9 @@ name: flatscan_beams_tensor_copier
 components:
 - name: rx_flatscan
   type: nvidia::gxf::DoubleBufferReceiver
+  parameters:
+    capacity: 1
+    policy: 0
 - name: tx_flatscan
   type: nvidia::gxf::DoubleBufferTransmitter
 - type: nvidia::gxf::DownstreamReceptiveSchedulingTerm
