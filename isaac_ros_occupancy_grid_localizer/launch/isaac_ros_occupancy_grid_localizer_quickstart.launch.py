@@ -30,7 +30,7 @@ def generate_launch_description():
 
     lifecycle_nodes = ['map_server']
     map_yaml_path_dir = os.path.join(
-        get_package_share_directory('isaac_ros_occupancy_grid_localizer'), 'maps', 'map.yaml')
+        get_package_share_directory('isaac_ros_occupancy_grid_localizer'), 'maps', 'isaac.yaml')
 
     occupancy_grid_localizer_node = ComposableNode(
         package='isaac_ros_occupancy_grid_localizer',
@@ -39,6 +39,7 @@ def generate_launch_description():
         parameters=[map_yaml_path_dir, {
             'loc_result_frame': 'map',
             'map_yaml_path': map_yaml_path_dir,
+            'use_sim_time': True
         }])
 
     occupancy_grid_localizer_container = ComposableNodeContainer(
@@ -57,7 +58,7 @@ def generate_launch_description():
     baselink_lidar_publisher = Node(
         package='tf2_ros', executable='static_transform_publisher',
         output='screen',
-        arguments=['0.0', '0.0', '0.0', '0.0', '0.0', '0.0', 'base_link',
+        arguments=['0.0', '0.0', '0.0', '0.0', '0.0', '0.0', 'front_3d_lidar',
                    'lidar_frame'])
 
     load_nodes = GroupAction(

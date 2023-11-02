@@ -34,6 +34,8 @@
 #include "tf2_ros/transform_listener.h"
 #include "tf2_ros/buffer.h"
 
+#include "tf2_ros/transform_broadcaster.h"
+
 namespace nvidia
 {
 namespace isaac_ros
@@ -129,6 +131,8 @@ private:
   unsigned int map_png_height_;
   std::shared_ptr<tf2_ros::TransformListener> tf_listener_;
   std::unique_ptr<tf2_ros::Buffer> tf_buffer_;
+
+  std::shared_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
 };
 
 }  // namespace occupancy_grid_localizer

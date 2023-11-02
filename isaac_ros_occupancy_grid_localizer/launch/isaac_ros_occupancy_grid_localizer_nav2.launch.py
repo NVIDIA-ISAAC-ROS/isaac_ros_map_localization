@@ -84,13 +84,17 @@ def generate_launch_description():
         parameters=[LaunchConfiguration('map_file'), {
             'loc_result_frame': 'map',
             'map_yaml_path': LaunchConfiguration('map_file'),
+            'use_sim_time': LaunchConfiguration('use_sim_time'),
         }],
         remappings=[('localization_result', '/initialpose')])
 
     laserscan_to_flatscan_node = ComposableNode(
         package='isaac_ros_pointcloud_utils',
         plugin='nvidia::isaac_ros::pointcloud_utils::LaserScantoFlatScanNode',
-        name='laserscan_to_flatscan')
+        name='laserscan_to_flatscan',
+        parameters=[{'use_sim_time': LaunchConfiguration('use_sim_time')}],
+        remappings=[('flatscan', '/flatscan_localization')]
+        )
 
     occupancy_grid_localizer_container = ComposableNodeContainer(
         package='rclcpp_components',
