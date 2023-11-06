@@ -33,7 +33,8 @@ def generate_launch_description():
     map_file_arg = DeclareLaunchArgument(
         'map_file', default_value=os.path.join(
             get_package_share_directory(
-                'isaac_ros_occupancy_grid_localizer'), 'maps', 'isaac_sim.yaml'),
+                # 'isaac_ros_occupancy_grid_localizer'), 'maps', 'isaac_sim.yaml'),
+                'carter_navigation'), 'maps', 'carter_warehouse_navigation.yaml'),
         description='Full path to map file to load')
     params_file_arg = DeclareLaunchArgument(
         'params_file', default_value=os.path.join(
@@ -122,7 +123,7 @@ def generate_launch_description():
         package='tf2_ros', executable='static_transform_publisher',
         parameters=[{'use_sim_time': LaunchConfiguration('use_sim_time')}],
         output='screen',
-        arguments=['0.0', '0.0', '0.0', '0.0', '0.0', '0.0', 'base_link',
+        arguments=['0.2', '0.0', '0.2', '0.0', '0.0', '0.0', 'base_link', # Original: arguments=['0.0', '0.0', '0.0', '0.0', '0.0', '0.0', 'base_link',
                    'lidar_frame'])
 
     return LaunchDescription([
