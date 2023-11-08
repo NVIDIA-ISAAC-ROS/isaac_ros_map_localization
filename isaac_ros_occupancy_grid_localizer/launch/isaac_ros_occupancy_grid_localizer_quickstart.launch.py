@@ -39,6 +39,7 @@ def generate_launch_description():
         parameters=[map_yaml_path_dir, {
             'loc_result_frame': 'map',
             'map_yaml_path': map_yaml_path_dir,
+            'use_sim_time': True
         }])
 
     occupancy_grid_localizer_container = ComposableNodeContainer(

@@ -39,11 +39,11 @@ FlatScantoLaserScanNode::FlatScantoLaserScanNode(rclcpp::NodeOptions options)
   max_range_fallback_(declare_parameter<double>("max_range_fallback", 200.0)),
   // topics
   flatscan_sub_(create_subscription<isaac_ros_pointcloud_interfaces::msg::FlatScan>(
-      "flatscan", 10, std::bind(&FlatScantoLaserScanNode::FlatScanCallback, this,
+      "/flatscan", 10, std::bind(&FlatScantoLaserScanNode::FlatScanCallback, this,
       std::placeholders::_1))),
   laserscan_pub_(
     create_publisher<sensor_msgs::msg::LaserScan>(
-      "scan", rclcpp::QoS(10)))
+      "/scan", rclcpp::QoS(10)))
 {}
 
 void FlatScantoLaserScanNode::FlatScanCallback(

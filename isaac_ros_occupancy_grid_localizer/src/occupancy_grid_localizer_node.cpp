@@ -139,14 +139,14 @@ OccupancyGridLocalizerNode::OccupancyGridLocalizerNode(const rclcpp::NodeOptions
   use_gxf_map_convention_(declare_parameter<bool>("use_gxf_map_convention", false)),
   robot_radius_(declare_parameter<double>("robot_radius", 0.25)),
   max_beam_error_(declare_parameter<double>("max_beam_error", 0.5)),
-  max_output_error_(declare_parameter<double>("max_output_error", 0.35)),
+  max_output_error_(declare_parameter<double>("max_output_error", 0.40 /*0.35*/)),
   min_output_error_(declare_parameter<double>("min_output_error", 0.22)),
   num_beams_gpu_(declare_parameter<int>("num_beams_gpu", 512)),
   batch_size_(declare_parameter<int>("batch_size", 512)),
   sample_distance_(declare_parameter<double>("sample_distance", 0.1)),
   out_of_range_threshold_(declare_parameter<double>("out_of_range_threshold", 100.0)),
   invalid_range_threshold_(declare_parameter<double>("invalid_range_threshold", 0.0)),
-  min_scan_fov_degrees_(declare_parameter<double>("min_scan_fov_degrees", 270.0)),
+  min_scan_fov_degrees_(declare_parameter<double>("min_scan_fov_degrees", 100.0 /*270.0*/)),
   use_closest_beam_(declare_parameter<bool>("use_closest_beam", true))
 {
   RCLCPP_DEBUG(get_logger(), "[OccupancyGridLocalizerNode] Constructor");
@@ -203,6 +203,8 @@ OccupancyGridLocalizerNode::OccupancyGridLocalizerNode(const rclcpp::NodeOptions
     this->create_publisher<isaac_ros_pointcloud_interfaces::msg::FlatScan>(
     INPUT_TOPIC_NAME_FLATSCAN, 10);
   startNitrosNode();
+
+  tf_broadcaster_ = std::make_shared<tf2_ros::TransformBroadcaster>(this);
 }
 
 void OccupancyGridLocalizerNode::GePngImageHeight(
@@ -378,6 +380,60 @@ void OccupancyGridLocalizerNode::LocResultNitrosSubCallback(
   // The ros_pose_isaac_transform transformation matrix is
   // applied so that the published output conforms to ROS map conventions
   *pose_handle = ros_map_origin_transform * ros_pose_isaac_transform * (*pose_handle);
+
+  geometry_msgs::msg::TransformStamped odom_to_base_link_transform;
+
+  try
+  {
+    odom_to_base_link_transform = tf_buffer_->lookupTransform("odom", kBaseLinkFrameName, tf2::TimePointZero);
+  }
+  catch (const tf2::TransformException & ex)
+  {
+    RCLCPP_INFO(
+      this->get_logger(), "Could not transform %s to %s: %s. Using Identity transform",
+      "odom", kBaseLinkFrameName, ex.what());
+  }
+
+  // map_to_base_link_transform = *pose_handle
+  auto map_to_base_link_transform = *pose_handle;
+
+
+
+  auto baselink_to_odom_transform_isaac = nvidia::isaac::Pose3d{
+    nvidia::isaac::SO3d::FromQuaternion(
+      nvidia::isaac::Quaterniond{ odom_to_base_link_transform.transform.rotation.w,
+      odom_to_base_link_transform.transform.rotation.x,
+      odom_to_base_link_transform.transform.rotation.y,
+      odom_to_base_link_transform.transform.rotation.z}),
+    nvidia::isaac::Vector3d(
+      odom_to_base_link_transform.transform.translation.x,
+      odom_to_base_link_transform.transform.translation.y,
+      odom_to_base_link_transform.transform.translation.z)
+  };
+
+  auto baselink_to_odom_transform = baselink_to_odom_transform_isaac.inverse();
+
+  auto base_link_to_map_transform = map_to_base_link_transform.inverse();
+
+  auto map_to_odom_transform = map_to_base_link_transform  * baselink_to_odom_transform;
+
+
+  geometry_msgs::msg::TransformStamped transform;
+  transform.header.stamp = this->get_clock()->now();
+  transform.header.frame_id = "map";
+  transform.child_frame_id = "odom";
+
+  transform.transform.translation.x = map_to_odom_transform.translation.x();
+  transform.transform.translation.y = map_to_odom_transform.translation.y();
+  transform.transform.translation.z = map_to_odom_transform.translation.z();
+
+  auto q = map_to_odom_transform.rotation.quaternion();
+  transform.transform.rotation.x = q.x();
+  transform.transform.rotation.y = q.y();
+  transform.transform.rotation.z = q.z();
+  transform.transform.rotation.w = q.w();
+
+  tf_broadcaster_->sendTransform(transform);
 }
 
 void OccupancyGridLocalizerNode::preLoadGraphCallback()

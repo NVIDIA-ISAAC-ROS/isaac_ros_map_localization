@@ -159,7 +159,7 @@ components:
     patch_size: [512, 512]
     out_of_range_threshold: 100.0
     invalid_range_threshold: 0.0
-    min_scan_fov_degrees: 270.0
+    min_scan_fov_degrees: 100.0 # 270.0
     use_closest_beam: true
 ---
 name: broadcaster
