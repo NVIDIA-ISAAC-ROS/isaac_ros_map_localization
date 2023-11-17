@@ -110,6 +110,10 @@ components:
       rx_localization_result: rx_localization_result
       tx_pose3d_cov: tx_pose3d_cov
       allocator: allocator
+  - type: nvidia::gxf::MemoryAvailableSchedulingTerm
+    parameters:
+      allocator: allocator
+      min_blocks: 1
 ---
 #######################
 # Global Localization #
@@ -226,6 +230,10 @@ components:
     tx_memory_type: 0
     allocator: allocator
     cuda_stream: cuda_stream/cuda_stream
+- type: nvidia::gxf::MemoryAvailableSchedulingTerm
+  parameters:
+    allocator: allocator
+    min_blocks: 1
 ---
 name: sink
 components:
