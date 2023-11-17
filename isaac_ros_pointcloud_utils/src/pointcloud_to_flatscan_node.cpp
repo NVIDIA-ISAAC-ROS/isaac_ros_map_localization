@@ -87,6 +87,7 @@ const nitros::NitrosPublisherSubscriberConfigMap CONFIG_MAP = {
       .qos = rclcpp::QoS(10),
       .compatible_data_format = OUTPUT_DEFAULT_TENSOR_FORMAT_FLATSCAN,
       .topic_name = OUTPUT_TOPIC_NAME_FLATSCAN,
+      .frame_id_source_key = INPUT_COMPONENT_KEY_POINTCLOUD,
     }
   }
 };
@@ -108,8 +109,8 @@ PointCloudToFlatScanNode::PointCloudToFlatScanNode(const rclcpp::NodeOptions & o
   min_z_(declare_parameter<double>("min_z", -0.1)),
   max_z_(declare_parameter<double>("max_z", 0.1)),
   max_points_(declare_parameter<double>("max_points", 150000)),
-  threshold_x_axis_(declare_parameter<double>("threshold_x_axis", false)),
-  threshold_y_axis_(declare_parameter<double>("threshold_y_axis", false))
+  threshold_x_axis_(declare_parameter<bool>("threshold_x_axis", false)),
+  threshold_y_axis_(declare_parameter<bool>("threshold_y_axis", false))
 {
   RCLCPP_DEBUG(get_logger(), "[PointCloudToFlatScanNode] Constructor");
 
