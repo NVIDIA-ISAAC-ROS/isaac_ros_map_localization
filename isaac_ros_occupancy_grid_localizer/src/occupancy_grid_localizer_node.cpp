@@ -1,11 +1,11 @@
 // SPDX-FileCopyrightText: NVIDIA CORPORATION & AFFILIATES
-// Copyright (c) 2023 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+// Copyright (c) 2023-2024 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+// http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -23,6 +23,8 @@
 #include <filesystem>
 namespace fs = std::filesystem;
 
+#include "isaac_ros_common/qos.hpp"
+
 #include "isaac_ros_occupancy_grid_localizer/occupancy_grid_localizer_node.hpp"
 #include "isaac_ros_nitros_pose_cov_stamped_type/nitros_pose_cov_stamped.hpp"
 #include "isaac_ros_nitros_flat_scan_type/nitros_flat_scan.hpp"
@@ -35,8 +37,8 @@ namespace fs = std::filesystem;
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 #pragma GCC diagnostic ignored "-Wmissing-field-initializers"
 #pragma GCC diagnostic ignored "-Wpedantic"
-#include "engine/core/math/pose3.hpp"
-#include "engine/core/math/types.hpp"
+#include "gems/core/math/pose3.hpp"
+#include "gems/core/math/types.hpp"
 #include "extensions/atlas/pose_tree_frame.hpp"
 #include "gems/common/pose_frame_uid.hpp"
 #include "gems/pose_tree/pose_tree.hpp"
@@ -84,10 +86,11 @@ constexpr char PACKAGE_NAME[] = "isaac_ros_occupancy_grid_localizer";
 
 const std::vector<std::pair<std::string, std::string>> EXTENSIONS = {
   {"isaac_ros_gxf", "gxf/lib/serialization/libgxf_serialization.so"},
-  {"isaac_ros_gxf", "gxf/lib/libgxf_cuda.so"},
-  {"isaac_ros_gxf", "gxf/lib/libgxf_utils.so"},
-  {"isaac_ros_gxf", "gxf/lib/libgxf_localization.so"},
-  {"isaac_ros_gxf", "gxf/lib/libgxf_flatscan_localization.so"}
+  {"gxf_isaac_cuda", "gxf/lib/libgxf_isaac_cuda.so"},
+  {"gxf_isaac_ros_cuda", "gxf/lib/libgxf_isaac_ros_cuda.so"},
+  {"gxf_isaac_utils", "gxf/lib/libgxf_isaac_utils.so"},
+  {"gxf_isaac_localization", "gxf/lib/libgxf_isaac_localization.so"},
+  {"gxf_isaac_flatscan_localization", "gxf/lib/libgxf_isaac_flatscan_localization.so"}
 };
 const std::vector<std::string> PRESET_EXTENSION_SPEC_NAMES = {
   "isaac_ros_occupancy_grid_localizer",
@@ -151,6 +154,21 @@ OccupancyGridLocalizerNode::OccupancyGridLocalizerNode(const rclcpp::NodeOptions
 {
   RCLCPP_DEBUG(get_logger(), "[OccupancyGridLocalizerNode] Constructor");
 
+  // This function sets the QoS parameter for publishers and subscribers setup by this NITROS node
+  rclcpp::QoS input_qos_ = ::isaac_ros::common::AddQosParameter(
+    *this, "DEFAULT",
+    "input_qos");
+  rclcpp::QoS output_qos_ = ::isaac_ros::common::AddQosParameter(
+    *this, "DEFAULT",
+    "output_qos");
+  for (auto & config : config_map_) {
+    if (config.second.topic_name == INPUT_TOPIC_NAME_FLATSCAN) {
+      config.second.qos = input_qos_;
+    } else {
+      config.second.qos = output_qos_;
+    }
+  }
+
   // Initialize tf buffer
   tf_buffer_ =
     std::make_unique<tf2_ros::Buffer>(this->get_clock());
@@ -195,13 +213,13 @@ OccupancyGridLocalizerNode::OccupancyGridLocalizerNode(const rclcpp::NodeOptions
       std::placeholders::_1, std::placeholders::_2));
   flat_scan_subscriber_ =
     this->create_subscription<isaac_ros_pointcloud_interfaces::msg::FlatScan>(
-    "flatscan", 10,
+    "flatscan", input_qos_,
     std::bind(
       &OccupancyGridLocalizerNode::FlatScanCallback, this,
       std::placeholders::_1));
   flat_scan_publisher_ =
     this->create_publisher<isaac_ros_pointcloud_interfaces::msg::FlatScan>(
-    INPUT_TOPIC_NAME_FLATSCAN, 10);
+    INPUT_TOPIC_NAME_FLATSCAN, input_qos_);
   startNitrosNode();
 }
 
@@ -226,19 +244,20 @@ void OccupancyGridLocalizerNode::GridSearchLocalizationCallback(
   const std::shared_ptr<std_srvs::srv::Empty::Request>,
   std::shared_ptr<std_srvs::srv::Empty::Response>)
 {
-  if (last_flat_scan_) {
-    flat_scan_publisher_->publish(**last_flat_scan_);
-  } else {
-    RCLCPP_WARN(
-      get_logger(),
-      "[OccupancyGridLocalizerNode] No Flatscan message received! Cannot localize.");
-  }
+  trigger_localization_on_next_flatscan_ = true;
+  RCLCPP_INFO(
+    get_logger(),
+    "[OccupancyGridLocalizerNode] Will trigger localization when next flatscan is received.");
 }
 
 void OccupancyGridLocalizerNode::FlatScanCallback(
   const std::shared_ptr<isaac_ros_pointcloud_interfaces::msg::FlatScan> flat_scan)
 {
-  last_flat_scan_ = flat_scan;
+  if (trigger_localization_on_next_flatscan_) {
+    flat_scan_publisher_->publish(*flat_scan);
+    RCLCPP_INFO(get_logger(), "[OccupancyGridLocalizerNode] Triggering localization now.");
+    trigger_localization_on_next_flatscan_ = false;
+  }
 }
 
 void OccupancyGridLocalizerNode::FlatScanNitrosSubCallback(

@@ -1,5 +1,5 @@
 # SPDX-FileCopyrightText: NVIDIA CORPORATION & AFFILIATES
-# Copyright (c) 2023 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# Copyright (c) 2023-2024 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -34,16 +34,31 @@ include_directories(${EIGEN3_INCLUDE_DIR})
 ament_auto_add_library(pointcloud_to_flatscan SHARED src/pointcloud_to_flatscan_node.cpp)
 rclcpp_components_register_nodes(pointcloud_to_flatscan "nvidia::isaac_ros::pointcloud_utils::PointCloudToFlatScanNode")
 set(node_plugins "${node_plugins}nvidia::isaac_ros::pointcloud_utils::PointCloudToFlatScanNode;$<TARGET_FILE:pointcloud_to_flatscan>\n")
+set_target_properties(pointcloud_to_flatscan PROPERTIES
+  BUILD_WITH_INSTALL_RPATH TRUE
+  BUILD_RPATH_USE_ORIGIN TRUE
+  INSTALL_RPATH_USE_LINK_PATH TRUE
+)
 
 # flatscan_to_laserscan_node
 ament_auto_add_library(flatscan_to_laserscan_node SHARED src/flatscan_to_laserscan_node.cpp)
 rclcpp_components_register_nodes(flatscan_to_laserscan_node "nvidia::isaac_ros::pointcloud_utils::FlatScantoLaserScanNode")
 set(node_plugins "${node_plugins}nvidia::isaac_ros::pointcloud_utils::FlatScantoLaserScanNode;$<TARGET_FILE:flatscan_to_laserscan_node>\n")
+set_target_properties(flatscan_to_laserscan_node PROPERTIES
+  BUILD_WITH_INSTALL_RPATH TRUE
+  BUILD_RPATH_USE_ORIGIN TRUE
+  INSTALL_RPATH_USE_LINK_PATH TRUE
+)
 
 # laserscan_to_flatscan_node
 ament_auto_add_library(laserscan_to_flatscan_node SHARED src/laserscan_to_flatscan_node.cpp)
 rclcpp_components_register_nodes(laserscan_to_flatscan_node "nvidia::isaac_ros::pointcloud_utils::LaserScantoFlatScanNode")
 set(node_plugins "${node_plugins}nvidia::isaac_ros::pointcloud_utils::LaserScantoFlatScanNode;$<TARGET_FILE:laserscan_to_flatscan_node>\n")
+set_target_properties(laserscan_to_flatscan_node PROPERTIES
+  BUILD_WITH_INSTALL_RPATH TRUE
+  BUILD_RPATH_USE_ORIGIN TRUE
+  INSTALL_RPATH_USE_LINK_PATH TRUE
+)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)

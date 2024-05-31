@@ -87,8 +87,6 @@ name: localization_to_pose3d
 components:
   - name: rx_localization_result
     type: nvidia::gxf::DoubleBufferReceiver
-    parameters:
-      policy: 0
   - name: allocator
     type: nvidia::gxf::BlockMemoryPool
     parameters:
@@ -102,8 +100,6 @@ components:
       min_size: 1
   - name: tx_pose3d_cov
     type: nvidia::gxf::DoubleBufferTransmitter
-    parameters:
-      policy: 0
   - name: localization_to_pose3d
     type: nvidia::isaac::localization::LocalizationResultToPose3d
     parameters:
@@ -122,8 +118,6 @@ name: global_localization
 components:
 - name: rx_flatscan
   type: nvidia::gxf::DoubleBufferReceiver
-  parameters:
-    policy: 0
 - name: message_scheduling_term
   type: nvidia::gxf::MessageAvailableSchedulingTerm
   parameters:
@@ -131,8 +125,6 @@ components:
     min_size: 1
 - name: rx_reset_signal
   type: nvidia::gxf::DoubleBufferReceiver
-  parameters:
-    policy: 0
 - name: message_scheduling_term
   type: nvidia::gxf::MessageAvailableSchedulingTerm
   parameters:
@@ -140,8 +132,6 @@ components:
     min_size: 1
 - name: tx_localization_result
   type: nvidia::gxf::DoubleBufferTransmitter
-  parameters:
-    policy: 0
 - name: grid_search_localizer
   type: nvidia::isaac::localization::GridSearchLocalizer
   parameters:
@@ -175,7 +165,6 @@ components:
   type: nvidia::gxf::DoubleBufferReceiver
   parameters:
     capacity: 1
-    policy: 0
 - type: nvidia::gxf::MessageAvailableSchedulingTerm
   parameters:
     receiver: rx_flatscan
@@ -203,7 +192,6 @@ components:
   type: nvidia::gxf::DoubleBufferReceiver
   parameters:
     capacity: 1
-    policy: 0
 - name: tx_flatscan
   type: nvidia::gxf::DoubleBufferTransmitter
 - type: nvidia::gxf::DownstreamReceptiveSchedulingTerm
@@ -221,7 +209,7 @@ components:
     block_size: 19200000
     num_blocks: 120
 - name: tensor_copier
-  type: nvidia::isaac::TensorCopier
+  type: nvidia::isaac_ros::TensorCopier
   parameters:
     receiver: rx_flatscan
     transmitter: tx_flatscan
@@ -241,7 +229,6 @@ components:
   type: nvidia::gxf::DoubleBufferReceiver
   parameters:
     capacity: 1
-    policy: 0
 - type: nvidia::gxf::MessageAvailableSchedulingTerm
   parameters:
     receiver: signal
@@ -281,11 +268,11 @@ components:
 components:
 - name: clock
   type: nvidia::gxf::RealtimeClock
-- type: nvidia::gxf::GreedyScheduler
+- type: nvidia::gxf::EventBasedScheduler
   parameters:
     clock: clock
     stop_on_deadlock: false
-    check_recession_period_us: 100
+    worker_thread_number: 2
 - type: nvidia::gxf::JobStatistics
   parameters:
     clock: clock

@@ -1,11 +1,11 @@
 // SPDX-FileCopyrightText: NVIDIA CORPORATION & AFFILIATES
-// Copyright (c) 2023 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+// Copyright (c) 2023-2024 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+// http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -76,8 +76,6 @@ public:
   void LocResultNitrosSubCallback(const gxf_context_t, nitros::NitrosTypeBase &);
 
 private:
-  std::optional<std::shared_ptr<isaac_ros_pointcloud_interfaces::msg::FlatScan>> last_flat_scan_;
-
   rclcpp::Publisher<isaac_ros_pointcloud_interfaces::msg::FlatScan>::SharedPtr flat_scan_publisher_;
 
   rclcpp::Subscription<isaac_ros_pointcloud_interfaces::msg::FlatScan>::SharedPtr
@@ -129,6 +127,9 @@ private:
   unsigned int map_png_height_;
   std::shared_ptr<tf2_ros::TransformListener> tf_listener_;
   std::unique_ptr<tf2_ros::Buffer> tf_buffer_;
+
+  // If true will trigger the localization when the next flatscan is received.
+  std::atomic<bool> trigger_localization_on_next_flatscan_ = false;
 };
 
 }  // namespace occupancy_grid_localizer
