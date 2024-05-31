@@ -1,11 +1,11 @@
 // SPDX-FileCopyrightText: NVIDIA CORPORATION & AFFILIATES
-// Copyright (c) 2023 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+// Copyright (c) 2023-2024 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+// http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,6 +19,8 @@
 #include <memory>
 #include <string>
 #include <utility>
+
+#include "isaac_ros_common/qos.hpp"
 
 #include "isaac_ros_pointcloud_utils/pointcloud_to_flatscan_node.hpp"
 #include "isaac_ros_nitros_flat_scan_type/nitros_flat_scan.hpp"
@@ -62,7 +64,7 @@ constexpr char APP_YAML_FILENAME[] = "config/pointcloud_to_flatscan_node.yaml";
 constexpr char PACKAGE_NAME[] = "isaac_ros_pointcloud_utils";
 
 const std::vector<std::pair<std::string, std::string>> EXTENSIONS = {
-  {"isaac_ros_gxf", "gxf/lib/libgxf_point_cloud.so"}
+  {"gxf_isaac_point_cloud", "gxf/lib/libgxf_isaac_point_cloud.so"}
 };
 const std::vector<std::string> PRESET_EXTENSION_SPEC_NAMES = {
   "isaac_ros_pointcloud_utils"
@@ -113,6 +115,19 @@ PointCloudToFlatScanNode::PointCloudToFlatScanNode(const rclcpp::NodeOptions & o
   threshold_y_axis_(declare_parameter<bool>("threshold_y_axis", false))
 {
   RCLCPP_DEBUG(get_logger(), "[PointCloudToFlatScanNode] Constructor");
+
+  // This function sets the QoS parameter for publishers and subscribers setup by this NITROS node
+  rclcpp::QoS input_qos_ = ::isaac_ros::common::AddQosParameter(
+    *this, "DEFAULT", "input_qos");
+  rclcpp::QoS output_qos_ = ::isaac_ros::common::AddQosParameter(
+    *this, "DEFAULT", "output_qos");
+  for (auto & config : config_map_) {
+    if (config.second.topic_name == INPUT_TOPIC_NAME_POINTCLOUD) {
+      config.second.qos = input_qos_;
+    } else {
+      config.second.qos = output_qos_;
+    }
+  }
 
   registerSupportedType<nvidia::isaac_ros::nitros::NitrosFlatScan>();
   registerSupportedType<nvidia::isaac_ros::nitros::NitrosPointCloud>();

@@ -28,3 +28,5 @@ body:
       path_parameter_keys: [atlas, occupancy_2d_map_provider]
     - type: nvidia::isaac::TensorCopier
       path_parameter_keys: [cuda_stream]
+    - type: nvidia::isaac_ros::TensorCopier
+      path_parameter_keys: [cuda_stream]

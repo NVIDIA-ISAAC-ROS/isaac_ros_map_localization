@@ -1,11 +1,11 @@
 // SPDX-FileCopyrightText: NVIDIA CORPORATION & AFFILIATES
-// Copyright (c) 2023 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+// Copyright (c) 2023-2024 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+// http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,6 +16,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "isaac_ros_pointcloud_utils/laserscan_to_flatscan_node.hpp"
+
+#include "isaac_ros_common/qos.hpp"
 
 #include "rclcpp_components/register_node_macro.hpp"
 #include "rclcpp/logger.hpp"
@@ -34,15 +36,19 @@ namespace pointcloud_utils
 
 
 LaserScantoFlatScanNode::LaserScantoFlatScanNode(rclcpp::NodeOptions options)
-: Node("laserscan_to_flatscan", options.use_intra_process_comms(true)),
-  // topics
-  laserscan_sub_(create_subscription<sensor_msgs::msg::LaserScan>(
-      "scan", 10, std::bind(&LaserScantoFlatScanNode::LaserScanCallback,
-      this, std::placeholders::_1))),
-  flatscan_pub_(
-    create_publisher<isaac_ros_pointcloud_interfaces::msg::FlatScan>(
-      "flatscan", rclcpp::QoS(10)))
+: Node("laserscan_to_flatscan", options.use_intra_process_comms(true))
 {
+  // This function sets the QoS parameter for publishers and subscribers setup by this ROS node
+  rclcpp::QoS input_qos_ = ::isaac_ros::common::AddQosParameter(
+    *this, "DEFAULT", "input_qos");
+  rclcpp::QoS output_qos_ = ::isaac_ros::common::AddQosParameter(
+    *this, "DEFAULT", "output_qos");
+
+  laserscan_sub_ = create_subscription<sensor_msgs::msg::LaserScan>(
+    "scan", input_qos_, std::bind(
+      &LaserScantoFlatScanNode::LaserScanCallback, this, std::placeholders::_1));
+  flatscan_pub_ =
+    create_publisher<isaac_ros_pointcloud_interfaces::msg::FlatScan>("flatscan", output_qos_);
 }
 
 void LaserScantoFlatScanNode::LaserScanCallback(const sensor_msgs::msg::LaserScan::SharedPtr msg)

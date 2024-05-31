@@ -64,7 +64,6 @@ components:
   type: nvidia::gxf::DoubleBufferReceiver
   parameters:
     capacity: 1
-    policy: 0
 - type: nvidia::gxf::MessageAvailableSchedulingTerm
   parameters:
     receiver: signal
@@ -84,11 +83,11 @@ components:
 components:
 - name: clock
   type: nvidia::gxf::RealtimeClock
-- type: nvidia::gxf::GreedyScheduler
+- type: nvidia::gxf::EventBasedScheduler
   parameters:
     clock: clock
     stop_on_deadlock: false
-    check_recession_period_us: 100
+    worker_thread_number: 2
 - type: nvidia::gxf::JobStatistics
   parameters:
     clock: clock

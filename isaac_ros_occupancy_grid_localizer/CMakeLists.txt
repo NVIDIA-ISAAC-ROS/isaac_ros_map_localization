@@ -1,5 +1,5 @@
 # SPDX-FileCopyrightText: NVIDIA CORPORATION & AFFILIATES
-# Copyright (c) 2023 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# Copyright (c) 2023-2024 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -33,12 +33,18 @@ ament_auto_add_library(occupancy_grid_localizer SHARED src/occupancy_grid_locali
 rclcpp_components_register_nodes(occupancy_grid_localizer "nvidia::isaac_ros::occupancy_grid_localizer::OccupancyGridLocalizerNode")
 set(node_plugins "${node_plugins}nvidia::isaac_ros::occupancy_grid_localizer::OccupancyGridLocalizerNode;\
   $<TARGET_FILE:occupancy_grid_localizer>\n")
-target_link_libraries(occupancy_grid_localizer Eigen3::Eigen)
+target_link_libraries(occupancy_grid_localizer
+    Eigen3::Eigen
+)
+set_target_properties(occupancy_grid_localizer PROPERTIES
+  BUILD_WITH_INSTALL_RPATH TRUE
+  BUILD_RPATH_USE_ORIGIN TRUE
+  INSTALL_RPATH_USE_LINK_PATH TRUE
+)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   ament_lint_auto_find_test_dependencies()
-
 
   # The FindPythonInterp and FindPythonLibs modules are removed
   if(POLICY CMP0148)
